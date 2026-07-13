@@ -65,7 +65,7 @@
                             <tr>
                                 <td class="font-monospace small">{{ $doc->doc_number }}</td>
                                 <td class="fw-semibold">{{ $doc->title }}</td>
-                                <td><span class="badge badge bg-secondary">{{ $doc->type->code }}</span></td>
+                                <td><span class="badge bg-light text-dark">{{ $doc->type->code }}</span></td>
                                 <td><span class="badge bg-secondary">{{ $doc->department->code }}</span></td>
                                 <td><span class="badge bg-{{ $statusColors[$doc->status] ?? 'secondary' }}">{{ $doc->statusLabel() }}</span></td>
                                 <td class="small text-muted">{{ $doc->creator->name ?? '—' }}</td>
