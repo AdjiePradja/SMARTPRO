@@ -1,4 +1,4 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<!-- <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
@@ -63,4 +63,76 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT). -->
+
+# SMARTPRO — Document Generator PT PPA
+
+SMARTPRO adalah aplikasi internal PT Putra Perkasa Abadi untuk menghasilkan dokumen mutu (SOP, SP, IK, JSA) berdasarkan kebutuhan departemen. Aplikasi dibuat dengan Laravel 12, Bootstrap 5, Alpine.js, dan MySQL.
+
+## Teknologi
+
+- PHP 8.2+
+- Laravel 12
+- Blade + Bootstrap 5
+- Alpine.js
+- MySQL 8
+- spatie/laravel-permission
+- barryvdh/laravel-dompdf
+- Bootstrap Icons
+
+## Fitur Utama
+
+- Manajemen dokumen SOP/SP/IK/JSA
+- Form generator berbasis schema JSON
+- Otorisasi role/jabatan
+- Workflows review dan approval
+- Preview dan export PDF
+- Penyimpanan lampiran foto per departemen
+
+## Struktur Kode Penting
+
+- `app/Http/Controllers`
+- `app/Models`
+- `app/Services`
+- `app/Policies`
+- `app/Http/Requests`
+- `resources/views/{jenis}`
+- `database/migrations`
+- `docs/`
+- `public/images/logo-ppa`
+
+## Konvensi Proyek
+
+- Controller dan model mengikuti standar Laravel.
+- Blade berada di `resources/views/{jenis}/{aksi}.blade.php`.
+- Route bernama `sop.index`, `sop.create`, `sop.edit`, dll.
+- Logika bisnis berada di `app/Services`.
+- Validasi menggunakan Form Request.
+- Otorisasi menggunakan Policy/Gate.
+- Data dokumen disimpan dalam JSON untuk setiap section, tidak menggunakan kolom statis per jenis.
+
+## Setup Lokal
+
+1. Salin `.env.example` menjadi `.env`
+2. Atur database MySQL di `.env`
+3. Jalankan:
+   - `composer install`
+   - `php artisan key:generate`
+   - `php artisan migrate`
+   - `php artisan storage:link`
+4. Jalankan development server:
+   - `php artisan serve`
+
+## Catatan Penting
+
+- Jangan commit file `.env`.
+- Jangan gunakan `migrate:fresh` atau perintah yang menghapus data tanpa izin.
+- Ikuti PRD dan `docs/CLAUDE.md` untuk aturan fitur dan alur kerja.
+- Perubahan besar harus dilakukan satu fase/tugas, lalu berhenti dan minta review.
+
+## Dokumentasi
+
+- `docs/PRD-SmartPro-v2.0.md`
+- `docs/INSTRUKSI-Merging-Berfase.md`
+- `docs/schema-sop.json`
+- `docs/Dokumen SOP contoh`
