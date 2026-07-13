@@ -21,7 +21,7 @@
                 <div>
                     <div class="font-monospace text-primary fw-bold">{{ $document->doc_number }}</div>
                     <h1 class="h5 fw-bold mb-1">{{ $document->title }}</h1>
-                    <span class="badge bg-light text-dark border">{{ $document->type->code }}</span>
+                    <span class="badge bg-secondary text-light border">{{ $document->type->code }}</span>
                     <span class="badge bg-secondary">{{ $document->department->code }}</span>
                     <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ $document->statusLabel() }}</span>
                 </div>
@@ -92,10 +92,10 @@
                     @endif
                 </div>
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-secondary" @click="preview()" data-bs-toggle="modal" data-bs-target="#previewModal"><i class="bi bi-eye"></i> Preview</button>
+                    <button type="button" class="btn btn-outline-info" @click="preview()" data-bs-toggle="modal" data-bs-target="#previewModal"><i class="bi bi-eye"></i> Preview</button>
                     @if ($editable)
                         @unless ($isLast)
-                            <button type="submit" name="action" value="next" class="btn btn-pp">Langkah Berikutnya <i class="bi bi-arrow-right"></i></button>
+                            <button type="submit" name="action" value="next" class="btn pp-border">Langkah Berikutnya <i class="bi bi-arrow-right"></i></button>
                         @else
                             <button type="submit" name="action" value="save" class="btn btn-outline-primary"><i class="bi bi-save"></i> Simpan</button>
                             <button type="submit" name="action" value="submit" class="btn btn-success"><i class="bi bi-send"></i> Kirim</button>

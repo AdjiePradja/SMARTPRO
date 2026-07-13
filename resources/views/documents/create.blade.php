@@ -4,7 +4,7 @@
 @section('content')
     <div class="mb-3">
         <a href="{{ route('documents.index') }}" class="text-decoration-none small text-muted"><i class="bi bi-arrow-left"></i> Kembali</a>
-        <h1 class="h4 fw-bold text-dark mb-0 mt-1">Dokumen Baru {{ $type->code }} — Langkah 1</h1>
+        <h1 class="h4 fw-bold text-dark  mb-0 mt-1">Dokumen Baru {{ $type->code }} — Langkah 1</h1>
         <p class="text-muted small mb-0">Tentukan nomor, judul, dan departemen dokumen.</p>
     </div>
 
@@ -21,7 +21,7 @@
 
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Jenis Dokumen</label>
-                            <input type="text" class="form-control bg-light" value="{{ $type->code }} — {{ $type->name }}" readonly>
+                            <input type="text" class="form-control bg-light" style="color: #17212b;" value="{{ $type->code }} — {{ $type->name }}" readonly>
                             <input type="hidden" name="document_type_id" value="{{ $type->id }}">
                         </div>
 
@@ -47,8 +47,8 @@
                         <div class="mb-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <label class="form-label small fw-semibold mb-0">Nomor Dokumen</label>
-                                <div class="form-check form-switch">
-                                    <input type="hidden" name="doc_number_manual" :value="manual ? 1 : 0">
+                                <div class="form-checkform-switch">
+                                    <input type="hidden" name="doc_number_manual"  :value="manual ? 1 : 0" >
                                     <input class="form-check-input" type="checkbox" id="manualToggle" x-model="manual">
                                     <label for="manualToggle" class="form-check-label small">Input manual</label>
                                 </div>
@@ -56,7 +56,7 @@
 
                             {{-- Auto (default): read-only preview --}}
                             <div x-show="!manual" x-cloak>
-                                <input type="text" class="form-control bg-light" value="{{ $numberPreview }}" readonly>
+                                <input type="text" class="form-control bg-light" style="color: #17212b;" value="{{ $numberPreview }}" readonly>
                                 <div class="form-text"><i class="bi bi-magic"></i> Nomor dibuat otomatis saat disimpan. Format: PPA-ADRO-JENIS-DEPT-NN.</div>
                             </div>
 
@@ -68,8 +68,8 @@
                         </div>
 
                         <div class="mt-4">
-                            <button class="btn btn-pp"><i class="bi bi-arrow-right-circle"></i> Buat & Lanjut Pengisian</button>
-                            <a href="{{ route('documents.index') }}" class="btn btn-light">Batal</a>
+                            <button class="btn btn-pp pp-border"><i class="bi bi-arrow-right-circle"></i> Buat & Lanjut Pengisian</button>
+                            <a href="{{ route('documents.index') }}" class="btn pp-border-error">Batal</a>
                         </div>
                     </form>
                 </div>
@@ -88,5 +88,6 @@
         </div>
     </div>
 
-    <style>[x-cloak]{display:none!important}</style>
+    <style>[x-cloak]{display:none!important}
+    </style>
 @endsection
