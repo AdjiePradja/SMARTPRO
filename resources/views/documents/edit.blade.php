@@ -111,10 +111,10 @@
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header py-2">
-                    <h5 class="modal-title h6 mb-0"><i class="bi bi-eye"></i> Preview 1:1 — {{ $document->doc_number }}</h5>
-                    <div class="d-flex gap-2">
+                    <h5 class="modal-title h6 mb-0"><i class="bi bi-eye"></i> Preview 1:1 — {{ $document->doc_number }}</h5>&nbsp;
+                    <div class="d-flex justify-content-evenly gap-2">
                         <a href="{{ route('documents.pdf', $document) }}" target="_blank" class="btn btn-sm btn-danger"><i class="bi bi-file-earmark-pdf"></i> Buka PDF</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" style="margin-top: 0.2px;" data-bs-dismiss="modal"></button>
                     </div>
                 </div>
                 <div class="modal-body p-0" style="background:#525659">

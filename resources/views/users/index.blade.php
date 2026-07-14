@@ -50,7 +50,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>Nama</th><th>NRP</th><th>No. HP</th><th>Departemen</th><th>Peran</th><th>Status</th><th class="text-end">Aksi</th>
+                            <th>Nama</th><th>NRP</th><th>No. HP</th><th>Departemen</th><th>Jabatan</th><th>Status</th><th class="text-end">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
