@@ -21,7 +21,7 @@
 
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Jenis Dokumen</label>
-                            <input type="text" class="form-control bg-light" style="color: #17212b;" value="{{ $type->code }} — {{ $type->name }}" readonly>
+                            <input type="text" class="form-control bg-light text-dark"  value="{{ $type->code }} — {{ $type->name }}" readonly>
                             <input type="hidden" name="document_type_id" value="{{ $type->id }}">
                         </div>
 
@@ -56,7 +56,7 @@
 
                             {{-- Auto (default): read-only preview --}}
                             <div x-show="!manual" x-cloak>
-                                <input type="text" class="form-control bg-light" style="color: #17212b;" value="{{ $numberPreview }}" readonly>
+                                <input type="text" class="form-control bg-light text-dark"  value="{{ $numberPreview }}" readonly>
                                 <div class="form-text"><i class="bi bi-magic"></i> Nomor dibuat otomatis saat disimpan. Format: PPA-ADRO-JENIS-DEPT-NN.</div>
                             </div>
 
