@@ -18,30 +18,7 @@
             localStorage.setItem('pp-theme', next);
         }
     </script>
-    <style>
-        :root { --pp-navy: #0f2b46; --pp-teal: #12707a; --pp-amber: #f5a623; }
-        body { background: #f4f6f9; }
-        .pp-sidebar {
-            width: 250px; min-height: 100vh; background: var(--pp-navy); color: #cdd7e2;
-            position: fixed; top: 0; left: 0; z-index: 1030;
-        }
-        .pp-sidebar .brand { color: #fff; font-weight: 800; letter-spacing: -.5px; }
-        .pp-sidebar .brand span { color: var(--pp-amber); }
-        .pp-sidebar .nav-link { color: #cdd7e2; border-radius: .5rem; margin: .1rem .5rem; padding: .55rem .85rem; }
-        .pp-sidebar .nav-link:hover { background: rgba(255,255,255,.08); color: #fff; }
-        .pp-sidebar .nav-link.active { background: var(--pp-teal); color: #fff; }
-        .pp-sidebar .nav-link i { width: 1.4rem; }
-        .pp-sidebar .section-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: #6f8299; padding: .75rem 1rem .25rem; }
-        .pp-main { margin-left: 250px; }
-        .pp-topbar { background: #fff; border-bottom: 1px solid #e3e8ef; }
-        .role-badge { background: var(--pp-teal); }
-        @media (max-width: 768px) { .pp-sidebar { transform: translateX(-100%); transition: .2s; } .pp-sidebar.open { transform: none; } .pp-main { margin-left: 0; } }
-        [x-cloak] { display: none !important; }
-        /* Dark theme overrides for custom (non-Bootstrap) surfaces */
-        [data-bs-theme="dark"] body { background: #14171a; }
-        [data-bs-theme="dark"] .pp-topbar { background: #1f2428 !important; border-color: #2b3138 !important; }
-        [data-bs-theme="dark"] .pp-topbar .text-secondary { color: #cdd7e2 !important; }
-    </style>
+    <link href="{{ asset('asset/style.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
 <body>

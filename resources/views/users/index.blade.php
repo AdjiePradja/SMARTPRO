@@ -18,7 +18,7 @@
             <h1 class="h4 fw-bold text-dark mb-0">Manajemen User</h1>
             <p class="text-muted small mb-0">Kelola semua akun dan buat akun staf.</p>
         </div>
-        <a href="{{ route('users.create') }}" class="btn btn-pp"><i class="bi bi-person-plus"></i> Buat Akun Staf</a>
+        <a href="{{ route('users.create') }}" class="btn btn-primary"><i class="bi bi-person-plus"></i> Buat Akun Staf</a>
     </div>
 
     <div class="card border-0 shadow-sm mb-3">
