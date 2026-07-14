@@ -39,7 +39,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label small fw-semibold">Jenis</label>
+                    <label class="form-label small  fw-semibold">Jenis</label>
                     <select name="type" class="form-select form-select-sm">
                         <option value="">Semua</option>
                         @foreach ($types as $code)<option value="{{ $code }}" @selected(($filters['type'] ?? '') === $code)>{{ $code }}</option>@endforeach
@@ -56,7 +56,7 @@
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table class="table table-hover r-2 align-middle mb-0">
                     <thead class="table-light">
                         <tr><th>No. Dokumen</th><th>Judul</th><th>Jenis</th><th>Dept</th><th>Status</th><th>Pembuat</th><th class="text-end">Aksi</th></tr>
                     </thead>
@@ -65,11 +65,11 @@
                             <tr>
                                 <td class="font-monospace small">{{ $doc->doc_number }}</td>
                                 <td class="fw-semibold">{{ $doc->title }}</td>
-                                <td><span class="badge bg-light text-dark border">{{ $doc->type->code }}</span></td>
+                                <td><span class="badge bg-light text-dark">{{ $doc->type->code }}</span></td>
                                 <td><span class="badge bg-secondary">{{ $doc->department->code }}</span></td>
                                 <td><span class="badge bg-{{ $statusColors[$doc->status] ?? 'secondary' }}">{{ $doc->statusLabel() }}</span></td>
                                 <td class="small text-muted">{{ $doc->creator->name ?? '—' }}</td>
-                                <td class="text-end text-nowrap">
+                                <td class="text-end  text-nowrap">
                                     <a href="{{ route('documents.pdf', $doc) }}" target="_blank" class="btn btn-sm btn-outline-danger"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
                                     @if ($doc->status === 'draft')
                                         <a href="{{ route('documents.edit', $doc) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i> Edit</a>
@@ -97,7 +97,7 @@
             </div>
         </div>
         @if ($documents->hasPages())
-            <div class="card-footer bg-white">{{ $documents->links() }}</div>
+            <div class="card-footer bg-light">{{ $documents->links() }}</div>
         @endif
     </div>
 @endsection
