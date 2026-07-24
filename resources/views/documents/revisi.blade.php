@@ -4,7 +4,7 @@
 @section('content')
     <div class="mb-3">
         <h1 class="h4 fw-bold text-dark mb-0">Dokumen Revisi</h1>
-        <p class="text-muted small mb-0">Dokumen yang ditolak dan perlu Anda perbaiki (Revisi Tipe A).</p>
+        <p class="text-muted small mb-0">Dokumen yang perlu Anda revisi: ditolak peninjau/approver, atau dokumen Berlaku yang diajukan revisi oleh SH/DH/PJO.</p>
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -18,9 +18,15 @@
                         @forelse ($documents as $doc)
                             @php $annotations = $doc->reviews->flatMap->annotations; @endphp
                             <tr>
-                                <td class="font-monospace small">{{ $doc->doc_number }}</td>
+                                <td class="font-monospace small">{{ $doc->displayNumber() }}</td>
                                 <td class="fw-semibold">{{ $doc->title }}</td>
-                                <td><span class="badge bg-danger">{{ $doc->statusLabel() }}</span></td>
+                                <td>
+                                    @if ($doc->isRevisionDraft() && $doc->status === 'draft')
+                                        <span class="badge bg-warning text-dark">Revisi Diajukan (Edisi {{ $doc->edisi }} Rev {{ $doc->no_revisi }})</span>
+                                    @else
+                                        <span class="badge bg-danger">{{ $doc->statusLabel() }}</span>
+                                    @endif
+                                </td>
                                 <td class="small">
                                     @forelse ($annotations->take(4) as $a)
                                         <div class="text-danger"><i class="bi bi-dot"></i> <span class="text-muted">[{{ $a->section_key }}]</span> {{ \Illuminate\Support\Str::limit($a->comment, 70) }}</div>

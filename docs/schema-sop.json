@@ -1,13 +1,13 @@
 {
   "doc_type": "SOP",
   "doc_type_label": "STANDARD OPERATING PROCEDURE",
-  "version": "1.0",
-  "note": "Schema acuan dokumen pertama. Jadi sumber tunggal untuk form, preview, dan PDF. Struktur ini SAMA untuk semua 7 departemen; yang berbeda hanya isi yang diketik user.",
+  "schema_version": "3.0",
+  "note": "Cetak biru dokumen SOP. Sumber tunggal untuk form, preview, dan PDF. Struktur SAMA untuk 7 departemen; yang berbeda hanya isi yang diketik user. Pengisian 2 STEP.",
 
   "header_fields": {
-    "note": "Bagian kop dokumen. Sebagian auto-generate, sebagian read-only mengikuti sistem.",
+    "note": "Kop dokumen. Sebagian auto, sebagian read-only mengikuti sistem.",
     "fields": [
-      { "key": "no_dokumen", "label": "No. Dokumen", "type": "auto", "manual_toggle": true, "pattern": "PPA-ADRO-SOP-{DEPT}-{NN}" },
+      { "key": "no_dokumen", "label": "No. Dokumen", "type": "auto", "manual_toggle": true, "pattern": "PPA-ADRO-SOP-{DEPT}-{NN}", "temporary_until": "approved", "temp_label": "Nomor sementara - final setelah disetujui" },
       { "key": "no_revisi", "label": "No. Revisi", "type": "auto", "default": 0 },
       { "key": "edisi", "label": "Edisi", "type": "auto", "default": 1 },
       { "key": "tgl_terbit", "label": "Tgl. Terbit", "type": "auto_date", "fill_on": "published" },
@@ -22,55 +22,24 @@
     "header": "_kop",
     "footer": "_footer",
     "footer_text": "Dokumen elektronik ini merupakan dokumen tidak terkendali apabila dicetak.",
-    "approval_page": "_pengesahan"
+    "approval_page": "_pengesahan",
+    "logo_path": "public/images/logo-ppa.png"
   },
 
   "steps": [
     {
       "step": 1,
-      "title": "Tujuan & Ruang Lingkup",
+      "title": "Isi Utama",
       "sections": [
-        {
-          "key": "tujuan",
-          "label": "I. TUJUAN",
-          "type": "rich_list",
-          "auto_number": "1.",
-          "min_items": 1,
-          "placeholder": "Masukkan poin tujuan..."
-        },
-        {
-          "key": "ruang_lingkup",
-          "label": "II. RUANG LINGKUP",
-          "type": "rich_list",
-          "auto_number": "2.",
-          "min_items": 1,
-          "placeholder": "Masukkan poin ruang lingkup..."
-        }
+        { "key": "tujuan", "label": "I. TUJUAN", "type": "rich_list", "auto_number": "1.", "min_items": 1, "placeholder": "Masukkan poin tujuan..." },
+        { "key": "ruang_lingkup", "label": "II. RUANG LINGKUP", "type": "rich_list", "auto_number": "2.", "min_items": 1, "placeholder": "Masukkan poin ruang lingkup..." },
+        { "key": "referensi", "label": "III. REFERENSI", "type": "reference_picker", "allow_add": true, "placeholder": "Masukkan referensi..." },
+        { "key": "definisi", "label": "IV. DEFINISI", "type": "rich_list", "auto_number": "4.", "placeholder": "Masukkan definisi..." }
       ]
     },
     {
       "step": 2,
-      "title": "Referensi & Definisi",
-      "sections": [
-        {
-          "key": "referensi",
-          "label": "III. REFERENSI",
-          "type": "reference_picker",
-          "allow_add": true,
-          "placeholder": "Masukkan referensi..."
-        },
-        {
-          "key": "definisi",
-          "label": "IV. DEFINISI",
-          "type": "rich_list",
-          "auto_number": "4.",
-          "placeholder": "Masukkan definisi..."
-        }
-      ]
-    },
-    {
-      "step": 3,
-      "title": "Aktivitas & Tanggung Jawab",
+      "title": "Aktivitas, Lampiran & Verifikasi",
       "sections": [
         {
           "key": "aktivitas",
@@ -83,13 +52,7 @@
             { "key": "deskripsi", "label": "Deskripsi Aktivitas", "type": "textarea", "placeholder": "Deskripsi aktivitas..." },
             { "key": "pic", "label": "PIC", "type": "text", "placeholder": "PIC (Contoh: Tim ICT)" }
           ]
-        }
-      ]
-    },
-    {
-      "step": 4,
-      "title": "Lampiran",
-      "sections": [
+        },
         {
           "key": "lampiran",
           "label": "VI. LAMPIRAN",
@@ -98,53 +61,29 @@
           "min_groups": 0,
           "group_fields": [
             { "key": "judul", "label": "Judul Lampiran", "type": "text", "placeholder": "Judul Lampiran (Contoh: Form Ceklis)" },
-            {
-              "key": "isi",
-              "label": "Isi Lampiran (pilih salah satu: teks atau gambar)",
-              "type": "text_or_image",
-              "text_placeholder": "Masukkan keterangan teks jika ada...",
-              "image_accept": "image/jpeg,image/png",
-              "image_max_mb": 2
-            }
+            { "key": "isi", "label": "Isi Lampiran (pilih salah satu: teks atau gambar)", "type": "text_or_image", "text_placeholder": "Masukkan keterangan teks jika ada...", "image_accept": "image/jpeg,image/png", "image_max_mb": 2, "storage_path": "storage/app/public/lampiran/{DEPT}/SOP/" }
           ]
-        }
-      ]
-    },
-    {
-      "step": 5,
-      "title": "Verifikasi & Approval",
-      "sections": [
-        {
-          "key": "pembuat_tambahan",
-          "label": "Pembuat Tambahan (opsional)",
-          "type": "user_picker",
-          "multiple": true,
-          "required": false,
-          "hint": "Gunakan tombol + jika pembuat lebih dari 1 orang."
         },
         {
-          "key": "peninjau",
-          "label": "Ditinjau Oleh (DH/SH)",
-          "type": "user_picker",
-          "role_filter": ["group_leader", "section_head"],
-          "required": true
-        },
-        {
-          "key": "penyetuju",
-          "label": "Disetujui Oleh (PJO)",
-          "type": "user_picker",
-          "role_filter": ["pimpinan"],
-          "required": true
+          "key": "verifikasi",
+          "label": "Verifikasi & Approval",
+          "type": "verification_block",
+          "note": "Peninjau & approver dipilih pembuat. Dropdown menampilkan Nama + NRP + Dept. Pilihan dibatasi sesuai jabatan pembuat (lihat PRD Bagian 3.2).",
+          "fields": [
+            { "key": "pembuat_tambahan", "label": "Pembuat Tambahan (opsional)", "type": "user_picker", "multiple": true, "required": false, "hint": "Hanya pembuat utama yang tanda tangan; tambahan tercatat di log." },
+            { "key": "peninjau", "label": "Ditinjau Oleh", "type": "user_picker", "required": true, "role_filter_dynamic": "by_creator_jabatan" },
+            { "key": "penyetuju", "label": "Disetujui Oleh", "type": "user_picker", "required": true, "role_filter_dynamic": "by_creator_jabatan" }
+          ]
         }
       ]
     }
   ],
 
   "approval_page_layout": {
-    "note": "Tabel halaman pengesahan pada PDF cetak.",
+    "note": "Tabel halaman pengesahan pada PDF. Hanya pembuat utama di 'Dibuat Oleh'.",
     "columns": ["Nama", "Jabatan", "Tanggal", "Pengesahan"],
     "rows": [
-      { "role_label": "Dibuat Oleh", "role": "pembuat" },
+      { "role_label": "Dibuat Oleh", "role": "pembuat_utama" },
       { "role_label": "Ditinjau Oleh", "role": "peninjau" },
       { "role_label": "Disetujui Oleh", "role": "penyetuju" }
     ],

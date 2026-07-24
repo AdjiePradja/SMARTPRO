@@ -4,7 +4,42 @@
 @section('content')
     <div class="mb-3">
         <h1 class="h4 fw-bold text-dark mb-0">Dokumen Berlaku</h1>
-        <p class="text-muted small mb-0">Dokumen aktif di departemen. Ajukan Revisi untuk memperbarui (0→1).</p>
+        <p class="text-muted small mb-0">Dokumen aktif {{ $departments->isNotEmpty() ? 'di 7 departemen' : 'di departemen Anda' }}. Ajukan Revisi untuk memperbarui (0→1).</p>
+    </div>
+
+    {{-- Filter & cari (2g) --}}
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <form method="GET" class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label small fw-semibold">Cari (nomor / judul)</label>
+                    <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" class="form-control form-control-sm" placeholder="mis. PPA-ADRO-SOP atau judul...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Jenis</label>
+                    <select name="type" class="form-select form-select-sm">
+                        <option value="">Semua</option>
+                        @foreach (['SOP','IK','SP','JSA'] as $code)<option value="{{ $code }}" @selected(strtoupper($filters['type'] ?? '') === $code)>{{ $code }}</option>@endforeach
+                    </select>
+                </div>
+                @if ($departments->isNotEmpty())
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold">Departemen</label>
+                    <select name="department_id" class="form-select form-select-sm">
+                        <option value="">Semua</option>
+                        @foreach ($departments as $d)<option value="{{ $d->id }}" @selected(($filters['department_id'] ?? '') == $d->id)>{{ $d->code }}</option>@endforeach
+                    </select>
+                </div>
+                @endif
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold invisible d-block mb-1">.</label>
+                    <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-input-h btn-secondary flex-grow-1"><i class="bi bi-search"></i> Filter</button>
+                        <a href="{{ route('documents.published') }}" class="btn btn-sm btn-input-h btn-light" title="Reset"><i class="bi bi-x-lg"></i></a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="card border-0 shadow-sm">
@@ -17,7 +52,7 @@
                     <tbody>
                         @forelse ($documents as $doc)
                             <tr>
-                                <td class="font-monospace small">{{ $doc->doc_number }}</td>
+                                <td class="font-monospace small">{{ $doc->displayNumber() }}</td>
                                 <td class="fw-semibold">{{ $doc->title }}</td>
                                 <td><span class="badge bg-light text-dark border">{{ $doc->type->code }}</span></td>
                                 <td><span class="badge bg-secondary">{{ $doc->department->code }}</span></td>
@@ -34,12 +69,24 @@
                                     @can('document.request_revision')
                                         @if ($doc->status === 'published')
                                             <form method="POST" action="{{ route('documents.requestRevision', $doc) }}" class="d-inline"
-                                                  onsubmit="return confirm('Ajukan revisi untuk {{ $doc->doc_number }}? Versi baru (Revisi {{ $doc->no_revisi + 1 }}) akan dibuat.')">
+                                                  data-confirm="Buat Revisi ke-{{ $doc->no_revisi + 1 }} untuk {{ $doc->displayNumber() }}? Versi lama tetap Berlaku sementara sampai versi baru disetujui."
+                                                  data-confirm-title="Ajukan Revisi?" data-confirm-ok="Ya, ajukan">
                                                 @csrf
                                                 <button class="btn btn-sm btn-warning"><i class="bi bi-arrow-repeat"></i> Ajukan Revisi</button>
                                             </form>
+                                            <form method="POST" action="{{ route('documents.makeObsolete', $doc) }}" class="d-inline"
+                                                  data-confirm="Jadikan {{ $doc->displayNumber() }} TIDAK BERLAKU? Dokumen dipindah ke halaman Dokumen Tidak Berlaku dan bisa dihapus di sana."
+                                                  data-confirm-title="Jadikan Tidak Berlaku?" data-confirm-ok="Ya, nonaktifkan" data-confirm-icon="warning">
+                                                @csrf
+                                                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-slash-circle"></i> Tidak Berlaku</button>
+                                            </form>
                                         @else
-                                            <span class="badge bg-light text-muted border">Revisi sedang berjalan</span>
+                                            <form method="POST" action="{{ route('documents.cancelRevisionB', $doc) }}" class="d-inline"
+                                                  data-confirm="Batalkan revisi? Versi baru dibuang dan versi lama ({{ $doc->displayNumber() }}) kembali Berlaku."
+                                                  data-confirm-title="Batalkan Revisi?" data-confirm-ok="Ya, batalkan">
+                                                @csrf
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i> Batalkan Revisi</button>
+                                            </form>
                                         @endif
                                     @endcan
                                 </td>

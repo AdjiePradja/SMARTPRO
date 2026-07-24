@@ -71,7 +71,7 @@
                                 <td class="text-end">
                                     @if ($u->id !== auth()->id())
                                         <form method="POST" action="{{ route('users.toggleStatus', $u) }}" class="d-inline"
-                                              onsubmit="return confirm('Ubah status akun {{ $u->name }}?')">
+                                              data-confirm="Ubah status akun {{ $u->name }}?" data-confirm-title="Ubah Status Akun?" data-confirm-ok="Ya, ubah">
                                             @csrf
                                             @if ($u->status === 'active')
                                                 <button class="btn btn-sm btn-outline-danger"><i class="bi bi-slash-circle"></i> Nonaktifkan</button>

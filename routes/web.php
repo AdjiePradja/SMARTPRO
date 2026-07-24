@@ -40,6 +40,17 @@ Route::middleware('auth')->group(function () {
     Route::middleware('active')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        // Komentar foto lampiran (v3.1 §6.2)
+        Route::post('attachments/{attachment}/comment', [\App\Http\Controllers\AttachmentCommentController::class, 'store'])->name('attachments.comment');
+
+        // Informasi Akun (semua role) — lihat & sunting (foto, no. HP, email)
+        Route::get('akun', [PageController::class, 'account'])->name('account.info');
+        Route::put('akun', [PageController::class, 'updateAccount'])->name('account.update');
+
+        // Audit Log (menu tersendiri, v3.1 §9)
+        Route::get('audit-log', [\App\Http\Controllers\AuditController::class, 'index'])
+            ->middleware('can:audit.view')->name('audit.index');
+
         // In-app notifications (bell)
         Route::get('notifications/{id}/open', [\App\Http\Controllers\NotificationController::class, 'open'])->name('notifications.open');
         Route::post('notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'readAll'])->name('notifications.readAll');
@@ -50,21 +61,34 @@ Route::middleware('auth')->group(function () {
             Route::get('documents/create', [DocumentController::class, 'create'])->name('documents.create');
             Route::post('documents', [DocumentController::class, 'store'])->name('documents.store');
         });
+        Route::get('documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
         Route::get('documents/{document}/edit', [DocumentController::class, 'edit'])->name('documents.edit');
         Route::post('documents/{document}/step', [DocumentController::class, 'saveStep'])->name('documents.saveStep');
         Route::post('documents/{document}/autosave', [DocumentController::class, 'autosave'])->name('documents.autosave');
+        Route::post('documents/{document}/lampiran-upload', [DocumentController::class, 'uploadAttachment'])->name('documents.uploadAttachment');
         Route::get('documents/{document}/preview', [DocumentController::class, 'preview'])->name('documents.preview');
         Route::get('documents/{document}/pdf', [DocumentController::class, 'pdf'])->name('documents.pdf');
         Route::post('documents/{document}/submit', [DocumentController::class, 'submit'])->name('documents.submit');
+        Route::post('documents/{document}/withdraw', [DocumentController::class, 'withdraw'])->name('documents.withdraw');
         Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 
         // Dokumen Revisi — rejected docs (Revisi Tipe A, Fase 4)
         Route::get('dokumen-revisi', [DocumentController::class, 'revisi'])->name('documents.revisi');
 
+        // Status Dokumen Staff (read-only, GL/SH) — v3.1 §3.3
+        Route::get('status-dokumen-staff', [DocumentController::class, 'staffStatus'])->name('documents.staffStatus');
+
         // Dokumen Berlaku + Ajukan Revisi (Tipe B, Fase 5)
         Route::get('dokumen-berlaku', [DocumentController::class, 'published'])->name('documents.published');
         Route::post('documents/{document}/request-revision', [DocumentController::class, 'requestRevision'])
             ->middleware('can:document.request_revision')->name('documents.requestRevision');
+        Route::post('documents/{document}/cancel-revision-b', [DocumentController::class, 'cancelRevisionB'])
+            ->middleware('can:document.request_revision')->name('documents.cancelRevisionB');
+
+        // Dokumen Tidak Berlaku (obsolete) — cleanup (v2 Fase D)
+        Route::get('dokumen-tidak-berlaku', [DocumentController::class, 'obsolete'])->name('documents.obsolete');
+        Route::post('documents/{document}/make-obsolete', [DocumentController::class, 'makeObsolete'])
+            ->middleware('can:document.request_revision')->name('documents.makeObsolete');
 
         // Peninjauan (Fase 4)
         Route::middleware('can:document.review')->group(function () {
@@ -72,6 +96,7 @@ Route::middleware('auth')->group(function () {
             Route::get('review/{document}', [ReviewController::class, 'show'])->name('review.show');
             Route::post('review/{document}', [ReviewController::class, 'store'])->name('review.store');
             Route::post('review/{document}/ai', [ReviewController::class, 'aiAnalyze'])->name('review.ai');
+            Route::post('review/{document}/cancel-revision', [ReviewController::class, 'cancelRevision'])->name('review.cancelRevision');
         });
 
         // Persetujuan (Fase 4)

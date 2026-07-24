@@ -1,0 +1,21 @@
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th colspan="7" style="font-size: 16px; font-weight: bold; height: 35px; background-color: #4F81BD; color: white; vertical-align: middle;">
+                        DAFTAR INDUK DOKUMEN SOP ICTMD
+                    </th>
+                </tr>
+                <tr style="background-color: #D9D9D9; font-weight: bold; height: 25px;">
+                    <th width="50">No</th>
+                    <th width="200">No. Dokumen</th>
+                    <th width="400">Judul Dokumen</th>
+                    <th width="120">Tgl. Terbit</th>
+                    <th width="60">Edisi</th>
+                    <th width="60">Revisi</th>
+                    <th width="120">Tgl. Revisi Terakhir</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>

@@ -24,36 +24,36 @@
                     <label class="form-label small fw-semibold mb-1">{{ $f['label'] ?? $f['key'] }}</label>
                     @if ($ftype === 'textarea')
                         <textarea class="form-control" rows="3" :name="`sections[{{ $key }}][${i}][{{ $f['key'] }}]`" x-model="row['{{ $f['key'] }}']" placeholder="{{ $f['placeholder'] ?? '' }}"></textarea>
-                    @elseif ($ftype === 'text_or_image')
-                        {{-- Teks ATAU gambar. ONE hidden input carries the persisted value
-                             (row[field]); the textarea is UI-only to avoid duplicate names. --}}
+                    @elseif ($ftype === 'image')
+                        {{-- Gambar diunggah LANGSUNG saat dipilih (AJAX) → path disimpan di
+                             hidden input. Preview cukup memuat ulang iframe (tanpa reload
+                             halaman) & foto tak hilang saat pindah langkah. --}}
                         <div x-data="{
-                                fkey: '{{ $f['key'] }}',
-                                get isImage() { return this.row[this.fkey] && String(this.row[this.fkey]).startsWith('lampiran/'); },
-                                setMode(m) {
-                                    if (m === 'image' && !this.isImage) this.row[this.fkey] = '';
-                                    if (m === 'text' && this.isImage) this.row[this.fkey] = '';
-                                    this.mode = m;
-                                }
-                             }" x-init="mode = isImage ? 'image' : 'text'">
+                            fkey: '{{ $f['key'] }}', uploading: false, err: '',
+                            get hasImg() { return this.row[this.fkey] && String(this.row[this.fkey]).startsWith('lampiran/'); },
+                            async up(e) {
+                                const file = e.target.files[0]; if (!file) return;
+                                this.err = ''; this.uploading = true;
+                                const fd = new FormData(); fd.append('image', file); fd.append('section', '{{ $key }}');
+                                try {
+                                    const r = await fetch('{{ route('documents.uploadAttachment', $document) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }, body: fd });
+                                    const j = await r.json();
+                                    if (r.ok && j.path) { this.row[this.fkey] = j.path; } else { this.err = j.message || 'Gagal mengunggah gambar.'; }
+                                } catch (_) { this.err = 'Gagal mengunggah gambar.'; }
+                                this.uploading = false; e.target.value = '';
+                            }
+                        }">
                             <input type="hidden" :name="`sections[{{ $key }}][${i}][{{ $f['key'] }}]`" :value="row[fkey]">
-                            <div class="btn-group btn-group-sm mb-2" role="group">
-                                <button type="button" class="btn" :class="mode==='text' ? 'btn-primary' : 'btn-outline-secondary'" @click="setMode('text')"><i class="bi bi-fonts"></i> Teks</button>
-                                <button type="button" class="btn" :class="mode==='image' ? 'btn-primary' : 'btn-outline-secondary'" @click="setMode('image')"><i class="bi bi-image"></i> Gambar</button>
-                            </div>
-                            <div x-show="mode==='text'">
-                                <textarea class="form-control" rows="2" x-model="row[fkey]" placeholder="{{ $f['text_placeholder'] ?? '' }}"></textarea>
-                            </div>
-                            <div x-show="mode==='image'" x-cloak>
-                                <template x-if="isImage">
-                                    <div class="mb-2">
-                                        <img :src="'/storage/' + row[fkey]" class="img-thumbnail" style="max-height:150px">
-                                        <button type="button" class="btn btn-sm btn-outline-danger ms-2" @click="row[fkey]=''"><i class="bi bi-x"></i> Hapus gambar</button>
-                                    </div>
-                                </template>
-                                <input type="file" accept="{{ $f['image_accept'] ?? 'image/jpeg,image/png' }}" class="form-control" :name="`files[{{ $key }}][${i}][{{ $f['key'] }}]`">
-                                <div class="form-text">Format JPG/PNG, maks {{ $f['image_max_mb'] ?? 2 }}MB.</div>
-                            </div>
+                            <template x-if="hasImg">
+                                <div class="mb-2">
+                                    <img :src="'/storage/' + row[fkey]" class="img-thumbnail" style="max-height:160px">
+                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" @click="row[fkey]=''"><i class="bi bi-x"></i> Hapus gambar</button>
+                                </div>
+                            </template>
+                            <input type="file" accept="{{ $f['image_accept'] ?? 'image/jpeg,image/png' }}" class="form-control" @change="up($event)" :disabled="uploading">
+                            <div class="form-text" x-show="!uploading">Format JPG/PNG, maks {{ $f['image_max_mb'] ?? 2 }}MB. Foto akan muncul di preview &amp; PDF.</div>
+                            <div class="form-text text-primary" x-show="uploading" x-cloak><span class="spinner-border spinner-border-sm"></span> Mengunggah…</div>
+                            <div class="text-danger small mt-1" x-show="err" x-text="err" x-cloak></div>
                         </div>
                     @else
                         <input type="text" class="form-control" :name="`sections[{{ $key }}][${i}][{{ $f['key'] }}]`" x-model="row['{{ $f['key'] }}']" placeholder="{{ $f['placeholder'] ?? '' }}">

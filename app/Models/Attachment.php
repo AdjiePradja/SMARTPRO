@@ -13,4 +13,9 @@ class Attachment extends Model
     {
         return $this->belongsTo(Document::class);
     }
+
+    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AttachmentComment::class);
+    }
 }

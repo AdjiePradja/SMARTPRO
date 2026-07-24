@@ -52,27 +52,58 @@ abstract class AbstractAiReviewer implements AiReviewerInterface
             $body .= "### Section: {$key}\n".$this->stringify($value)."\n\n";
         }
 
+        // Persona & metode audit dari file instruksi (docs/ai/Instruksi AI.md).
+        $instruction = $this->auditorInstruction();
+
         return <<<PROMPT
-Anda adalah ahli dokumentasi mutu pertambangan (ISO 9001 / SMKP) yang meninjau dokumen internal
-perusahaan. Jenis dokumen: {$document->type->code} — "{$document->title}".
+{$instruction}
 
-Tinjau isi dokumen di bawah ini. Berikan:
-1. Ringkasan singkat isi dokumen (2-3 kalimat, Bahasa Indonesia).
-2. Daftar temuan bagian yang tidak sesuai, tidak jelas, atau bisa dioptimalkan.
+---
+Konteks output: Anda mengaudit dokumen jenis **{$document->type->code}** berjudul "{$document->title}".
 
-Balas HANYA dalam format JSON valid dengan struktur berikut:
+ATURAN KEDALAMAN AUDIT (WAJIB):
+- Audit HARUS MENYELURUH — periksa SETIAP aspek pada instruksi di atas: kelengkapan,
+  struktur & sistematika, konsistensi istilah/penomoran/format, tata bahasa & kalimat
+  ambigu, kejelasan tujuan/ruang lingkup/definisi/referensi/aktivitas/tanggung jawab/
+  lampiran, kesesuaian & kelogisan alur kerja, langkah yang hilang, risiko operasional,
+  risiko HSE (bila relevan), kepatuhan best practice, dan kemudahan implementasi.
+- Laporkan SETIAP masalah nyata sebagai SATU temuan terpisah. Jumlah temuan mengikuti
+  JUMLAH MASALAH yang ditemukan — JANGAN diringkas menjadi satu atau dua temuan. Untuk
+  dokumen yang lemah, wajar bila temuan berjumlah banyak (mis. 5-15).
+- DILARANG memberi hasil/saran sepanjang satu kalimat saja. Setiap "issue" dan
+  "suggestion" harus dijelaskan memadai (beberapa kalimat).
+
+Balas HANYA JSON valid (tanpa teks lain). Severity mengikuti instruksi
+(Critical/High/Medium/Low/Observation → critical|major|minor|info). Semua teks Bahasa Indonesia.
 {
-  "summary": "string",
+  "summary": "Ringkasan audit LENGKAP 5-10 kalimat: penilaian umum, KELEBIHAN dokumen, kekurangan utama, dan KESIMPULAN kelayakan dokumen.",
   "findings": [
-    { "section_key": "string (gunakan nama section di atas)", "severity": "info|minor|major|critical", "issue": "apa masalahnya", "suggestion": "saran perbaikan konkret" }
+    {
+      "section_key": "nama section terkait (lihat daftar di bawah)",
+      "severity": "info|minor|major|critical",
+      "issue": "Jelaskan spesifik: APA yang kurang/salah DAN MENGAPA itu menjadi masalah (2-4 kalimat).",
+      "suggestion": "Rekomendasi konkret, spesifik, dan dapat langsung diterapkan (boleh beberapa kalimat atau poin bernomor)."
+    }
   ]
 }
-
-Jika tidak ada temuan, kembalikan findings berupa array kosong.
+Jika benar-benar tidak ada masalah, findings = [] dan jelaskan alasannya pada summary.
 
 ISI DOKUMEN:
 {$body}
 PROMPT;
+    }
+
+    /** Muat instruksi auditor dari docs/ai; fallback ke persona ringkas. */
+    protected function auditorInstruction(): string
+    {
+        foreach (['docs/ai/Instruksi AI.md', 'docs/ai/AI.md'] as $path) {
+            $full = base_path($path);
+            if (is_file($full)) {
+                return trim(file_get_contents($full));
+            }
+        }
+
+        return 'Anda adalah AI Document Auditor profesional (QMS/HSE) yang mengaudit dokumen mutu pertambangan secara objektif berbasis best practice.';
     }
 
     protected function stringify(mixed $value): string

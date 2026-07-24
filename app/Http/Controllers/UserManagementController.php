@@ -58,13 +58,18 @@ class UserManagementController extends Controller
             ? null
             : $request->role;
 
+        // Pimpinan tidak terikat departemen (v3.1 §3.1).
+        $departmentId = $request->role === \Database\Seeders\RolePermissionSeeder::ROLE_PIMPINAN
+            ? null
+            : $request->department_id;
+
         $user = User::create([
             'name' => $request->name,
             'nrp' => $request->nrp,
             'jabatan' => $jabatan,
             'nomor_hp' => $request->nomor_hp,
             'email' => $request->email,
-            'department_id' => $request->department_id,
+            'department_id' => $departmentId,
             'password' => Hash::make($request->password),
             'status' => 'active', // admin-created staff accounts are active immediately
         ]);

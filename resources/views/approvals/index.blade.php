@@ -17,7 +17,7 @@
                     <tbody>
                         @forelse ($documents as $doc)
                             <tr>
-                                <td class="font-monospace small">{{ $doc->doc_number }}</td>
+                                <td class="font-monospace small">{{ $doc->displayNumber() }}</td>
                                 <td class="fw-semibold">{{ $doc->title }}</td>
                                 <td><span class="badge bg-secondary">{{ $doc->department->code }}</span></td>
                                 <td class="small">{{ $doc->creator->name ?? '—' }}</td>

@@ -6,8 +6,9 @@
         'admin_it' => 'Admin IT — wewenang penuh',
         'pimpinan' => 'Pimpinan (PJO) — approver final',
         'section_head' => 'Section Head — peninjau & approver',
-        'group_leader' => 'Group Leader — pembuat & peninjau',
-        'staff' => 'Staff — pembuat dokumen',
+        'departemen_head' => 'Departemen Head — peninjau & approver',
+        'group_leader' => 'Group Leader — satu-satunya pembuat',
+        'staff' => 'Non-Staff — read-only',
     ];
 @endphp
 

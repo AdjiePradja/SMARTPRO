@@ -57,7 +57,7 @@
                             {{-- Auto (default): read-only preview --}}
                             <div x-show="!manual" x-cloak>
                                 <input type="text" class="form-control bg-light" value="{{ $numberPreview }}" readonly>
-                                <div class="form-text"><i class="bi bi-magic"></i> Nomor dibuat otomatis saat disimpan. Format: PPA-ADRO-JENIS-DEPT-NN.</div>
+                                <div class="form-text"><i class="bi bi-magic"></i> <strong>Nomor sementara</strong> — final dikunci setelah disetujui. Format: PPA-ADRO-JENIS-DEPT-NN.</div>
                             </div>
 
                             {{-- Manual: editable + uniqueness validated --}}

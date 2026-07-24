@@ -32,12 +32,15 @@ class DocumentService
     ): Document {
         return DB::transaction(function () use ($creator, $type, $department, $title, $manualNumber) {
             $isManual = filled($manualNumber);
+            $number = $isManual ? $manualNumber : $this->numbering->generateTemp($type, $department);
 
             $document = Document::create([
                 'document_type_id' => $type->id,
                 'department_id' => $department->id,
                 'title' => $title,
-                'doc_number' => $isManual ? $manualNumber : $this->numbering->generate($type, $department),
+                'doc_number' => $number,          // legacy (dormant)
+                'doc_number_temp' => $number,     // nomor sementara (v3.1 §5)
+                'doc_number_final' => null,       // dikunci saat approved (Fase 4)
                 'doc_number_manual' => $isManual,
                 'status' => 'draft',
                 'current_step' => 1,
@@ -73,10 +76,21 @@ class DocumentService
     }
 
     /**
-     * Revisi Tipe B (PRD v2 §3.3): pembaruan dokumen Berlaku (0→1→…).
-     * Snapshot versi lama ke document_versions, set lama "Sedang Direvisi"
-     * (masih Berlaku sementara), lalu buat versi baru (No. Revisi naik) dengan
-     * salinan isi — direview dari awal (anotasi lama tidak dibawa).
+     * Roll-over Edisi/Revisi: revisi naik 0→1→…→4; revisi berikutnya (yang ke-5)
+     * menaikkan EDISI dan mengembalikan revisi ke 0 (angka 5 tak pernah tampil).
+     *
+     * @return array{0:int,1:int} [edisi, no_revisi] versi berikutnya
+     */
+    public static function nextEditionRevision(int $edisi, int $noRevisi): array
+    {
+        return $noRevisi + 1 >= 5 ? [$edisi + 1, 0] : [$edisi, $noRevisi + 1];
+    }
+
+    /**
+     * Revisi Tipe B (PRD v2 §3.3): pembaruan dokumen Berlaku (0→1→…→4, lalu
+     * Edisi naik & revisi kembali 0). Snapshot versi lama ke document_versions,
+     * set lama "Sedang Direvisi" (masih Berlaku sementara), lalu buat versi baru
+     * dengan salinan isi — direview dari awal (anotasi lama tidak dibawa).
      */
     public function requestRevision(Document $published, User $requester): Document
     {
@@ -84,6 +98,8 @@ class DocumentService
             $this->snapshot($published);
 
             $published->update(['status' => 'sedang_direvisi']);
+
+            [$edisi, $noRevisi] = self::nextEditionRevision((int) ($published->edisi ?: 1), (int) $published->no_revisi);
 
             $new = Document::create([
                 'doc_number' => $published->doc_number,          // nomor diwariskan
@@ -94,10 +110,13 @@ class DocumentService
                 'status' => 'draft',
                 'current_step' => 1,
                 'revision_round' => 0,
-                'no_revisi' => $published->no_revisi + 1,         // No. Revisi naik
-                'edisi' => $published->edisi,
+                'no_revisi' => $noRevisi,
+                'revises_document_id' => $published->id,   // penanda draft revisi (tahap-3 wizard)
+                'edisi' => (string) $edisi,
                 'is_controlled' => $published->is_controlled,
-                'created_by' => $requester->id,
+                // Pemilik versi baru = PEMBUAT ASLI (GL), bukan pengaju revisi (SH/DH/PJO),
+                // karena hanya pembuat (GL) yang menyunting & mengirim dokumen (v2 rev).
+                'created_by' => $published->created_by,
             ]);
 
             // Salin isi dari versi lama supaya revisor mulai dari isi terakhir.
@@ -108,7 +127,7 @@ class DocumentService
                 ]);
             }
 
-            $new->authors()->create(['user_id' => $requester->id, 'is_primary' => true]);
+            $new->authors()->create(['user_id' => $published->created_by, 'is_primary' => true]);
 
             $this->audit->log('document.request_revision', $new->id, [
                 'from_document_id' => $published->id,

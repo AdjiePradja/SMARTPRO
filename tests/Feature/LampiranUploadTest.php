@@ -18,27 +18,50 @@ class LampiranUploadTest extends TestCase
     {
         Storage::fake('public');
 
-        $staff = User::where('nrp', 'STF-0001')->firstOrFail();
+        $gl = User::where('nrp', 'GL-0001')->firstOrFail();
         $type = DocumentType::where('code', 'SOP')->firstOrFail();
 
-        $doc = app(DocumentService::class)->createDraft($staff, $type, $staff->department, 'Uji Lampiran');
+        $doc = app(DocumentService::class)->createDraft($gl, $type, $gl->department, 'Uji Lampiran');
         $doc->update(['current_step' => 2]);
 
-        $this->actingAs($staff)
+        $this->actingAs($gl)
             ->post(route('documents.saveStep', $doc), [
                 'step' => 2,
                 'action' => 'save',
-                'sections' => ['lampiran' => [['judul' => 'Foto Perangkat', 'isi' => '']]],
-                'files' => ['lampiran' => [['isi' => UploadedFile::fake()->image('foto.png', 300, 200)]]],
+                'sections' => ['lampiran' => [['judul' => 'Foto Perangkat', 'keterangan' => 'Contoh perangkat', 'gambar' => '']]],
+                'files' => ['lampiran' => [['gambar' => UploadedFile::fake()->image('foto.png', 300, 200)]]],
             ])
             ->assertRedirect();
 
         $doc->refresh();
-        $isi = $doc->contentMap()['lampiran'][0]['isi'] ?? null;
+        $gambar = $doc->contentMap()['lampiran'][0]['gambar'] ?? null;
 
-        $this->assertNotNull($isi, 'lampiran isi should not be null after upload');
-        $this->assertStringStartsWith('lampiran/', (string) $isi, 'isi should be a stored image path');
-        Storage::disk('public')->assertExists($isi);
+        $this->assertNotNull($gambar, 'lampiran gambar should not be null after upload');
+        $this->assertStringStartsWith('lampiran/', (string) $gambar, 'gambar should be a stored image path');
+        Storage::disk('public')->assertExists($gambar);
         $this->assertSame(1, $doc->attachments()->count(), 'an attachment row should be created');
+    }
+
+    public function test_ajax_lampiran_upload_returns_stored_path(): void
+    {
+        Storage::fake('public');
+
+        $gl = User::where('nrp', 'GL-0001')->firstOrFail();
+        $type = DocumentType::where('code', 'SOP')->firstOrFail();
+
+        $doc = app(DocumentService::class)->createDraft($gl, $type, $gl->department, 'Uji Upload AJAX');
+
+        $response = $this->actingAs($gl)
+            ->postJson(route('documents.uploadAttachment', $doc), [
+                'section' => 'lampiran',
+                'image' => UploadedFile::fake()->image('foto.png', 300, 200),
+            ])
+            ->assertOk()
+            ->assertJson(['ok' => true]);
+
+        $path = $response->json('path');
+        $this->assertStringStartsWith('lampiran/', (string) $path, 'endpoint mengembalikan path tersimpan');
+        Storage::disk('public')->assertExists($path);
+        $this->assertSame(1, $doc->attachments()->count(), 'satu baris attachment dibuat');
     }
 }

@@ -37,14 +37,14 @@ class AiReviewTest extends TestCase
         });
 
         $staff = User::where('nrp', 'STF-0001')->firstOrFail();
-        $gl = User::where('nrp', 'GL-0001')->firstOrFail();
+        $sh = User::where('nrp', 'SH-0001')->firstOrFail();
         $type = DocumentType::where('code', 'SOP')->firstOrFail();
 
         $doc = app(DocumentService::class)->createDraft($staff, $type, $staff->department, 'SOP AI');
         $doc->contents()->create(['section_key' => 'tujuan', 'value_json' => ['Tujuan']]);
-        $doc->update(['status' => 'in_review', 'reviewer_id' => $gl->id, 'submitted_at' => now()]);
+        $doc->update(['status' => 'in_review', 'reviewer_id' => $sh->id, 'submitted_at' => now()]);
 
-        $this->actingAs($gl)
+        $this->actingAs($sh)
             ->postJson(route('review.ai', $doc))
             ->assertOk()
             ->assertJson([
@@ -54,18 +54,39 @@ class AiReviewTest extends TestCase
             ]);
     }
 
+    public function test_adopted_ai_annotation_is_flagged(): void
+    {
+        $staff = User::where('nrp', 'STF-0001')->firstOrFail();
+        $sh = User::where('nrp', 'SH-0001')->firstOrFail();
+        $type = DocumentType::where('code', 'SOP')->firstOrFail();
+
+        $doc = app(DocumentService::class)->createDraft($staff, $type, $staff->department, 'SOP AI Adopt');
+        $doc->contents()->create(['section_key' => 'tujuan', 'value_json' => ['Tujuan']]);
+        $doc->update(['status' => 'in_review', 'reviewer_id' => $sh->id]);
+
+        $this->actingAs($sh)->post(route('review.store', $doc), [
+            'decision' => 'reject',
+            'annotations' => ['tujuan' => [0 => 'Perjelas cakupan tujuan.']],
+            'annotations_ai' => ['tujuan' => [0 => '1']], // ditandai adopsi dari AI
+        ])->assertRedirect();
+
+        $annotation = $doc->reviews()->latest()->first()->annotations()->first();
+        $this->assertTrue((bool) $annotation->ai_generated, 'anotasi ditandai berasal dari AI');
+        $this->assertTrue((bool) $annotation->ai_adopted);
+    }
+
     public function test_ai_disabled_returns_gracefully(): void
     {
         config(['services.ai.enabled' => false]);
 
         $staff = User::where('nrp', 'STF-0001')->firstOrFail();
-        $gl = User::where('nrp', 'GL-0001')->firstOrFail();
+        $sh = User::where('nrp', 'SH-0001')->firstOrFail();
         $type = DocumentType::where('code', 'SOP')->firstOrFail();
 
         $doc = app(DocumentService::class)->createDraft($staff, $type, $staff->department, 'SOP AI Off');
-        $doc->update(['status' => 'in_review', 'reviewer_id' => $gl->id]);
+        $doc->update(['status' => 'in_review', 'reviewer_id' => $sh->id]);
 
-        $this->actingAs($gl)
+        $this->actingAs($sh)
             ->postJson(route('review.ai', $doc))
             ->assertOk()
             ->assertJson(['enabled' => false, 'findings' => []]);

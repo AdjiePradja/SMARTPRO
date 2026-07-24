@@ -16,15 +16,19 @@ class User extends Authenticatable
     use HasFactory, Notifiable, SoftDeletes, HasRoles;
 
     // Jabatan (structural identity, PRD v2 §2.1). Drives the approval flow.
+    // Catatan: kunci internal 'staff' DIPERTAHANKAN (agar tak memecah kode/data
+    // lama); hanya labelnya jadi "Non-Staff" (read-only, tak bisa membuat dokumen).
     public const JABATAN_STAFF = 'staff';
     public const JABATAN_GROUP_LEADER = 'group_leader';
     public const JABATAN_SECTION_HEAD = 'section_head';
+    public const JABATAN_DEPARTEMEN_HEAD = 'departemen_head';
     public const JABATAN_PIMPINAN = 'pimpinan';
 
     public const JABATAN_LABELS = [
-        self::JABATAN_STAFF => 'Staff',
+        self::JABATAN_STAFF => 'Non-Staff',
         self::JABATAN_GROUP_LEADER => 'Group Leader',
         self::JABATAN_SECTION_HEAD => 'Section Head',
+        self::JABATAN_DEPARTEMEN_HEAD => 'Departemen Head',
         self::JABATAN_PIMPINAN => 'Pimpinan',
     ];
 
@@ -35,6 +39,7 @@ class User extends Authenticatable
         'jabatan',
         'nomor_hp',
         'email',
+        'photo_path',
         'password',
         'department_id',
         'status',
@@ -56,6 +61,12 @@ class User extends Authenticatable
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    /** URL foto profil (avatar) bila ada, jika tidak null. */
+    public function photoUrl(): ?string
+    {
+        return $this->photo_path ? \Illuminate\Support\Facades\Storage::url($this->photo_path) : null;
     }
 
     public function documents(): HasMany

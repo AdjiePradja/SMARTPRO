@@ -23,10 +23,11 @@ class OpenRouterReviewer extends AbstractAiReviewer
             ->post(self::ENDPOINT, [
                 'model' => $this->model,
                 'messages' => [
-                    ['role' => 'system', 'content' => 'Anda meninjau dokumen mutu pertambangan. Balas hanya JSON valid.'],
+                    ['role' => 'system', 'content' => 'Anda AI Document Auditor QMS/HSE. Audit menyeluruh & mendalam; laporkan setiap masalah sebagai temuan terpisah. Balas hanya JSON valid.'],
                     ['role' => 'user', 'content' => $prompt],
                 ],
                 'temperature' => 0.3,
+                'max_tokens' => 3000,   // ruang cukup untuk banyak temuan yang detail (2f)
                 'response_format' => ['type' => 'json_object'],
             ]);
 

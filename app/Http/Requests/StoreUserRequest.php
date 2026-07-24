@@ -21,7 +21,8 @@ class StoreUserRequest extends FormRequest
             'nrp' => ['required', 'string', 'max:50', 'unique:users,nrp'],
             'nomor_hp' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
-            'department_id' => ['required', 'exists:departments,id'],
+            // Pimpinan tanpa departemen (v3.1 §3.1); Admin dept opsional.
+            'department_id' => ['nullable', 'exists:departments,id', 'required_unless:role,'.RolePermissionSeeder::ROLE_PIMPINAN.','.RolePermissionSeeder::ROLE_ADMIN],
             'role' => ['required', Rule::in(self::assignableRoles())],
             'password' => ['required', 'confirmed', Password::min(8)],
         ];
@@ -34,6 +35,7 @@ class StoreUserRequest extends FormRequest
             RolePermissionSeeder::ROLE_ADMIN,
             RolePermissionSeeder::ROLE_PIMPINAN,
             RolePermissionSeeder::ROLE_SECTION_HEAD,
+            RolePermissionSeeder::ROLE_DEPARTEMEN_HEAD,
             RolePermissionSeeder::ROLE_GROUP_LEADER,
             RolePermissionSeeder::ROLE_STAFF,
         ];

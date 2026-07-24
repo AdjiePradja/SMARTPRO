@@ -39,12 +39,13 @@
                                     <td><span class="badge bg-secondary">{{ $pending->department->code ?? '—' }}</span></td>
                                     <td class="small text-muted">{{ $pending->email }}</td>
                                     <td class="text-end">
-                                        <form method="POST" action="{{ route('users.approve', $pending) }}" class="d-inline">
+                                        <form method="POST" action="{{ route('users.approve', $pending) }}" class="d-inline"
+                                              data-confirm="Setujui pendaftaran akun {{ $pending->name }}?" data-confirm-title="Setujui Akun?" data-confirm-ok="Ya, setujui">
                                             @csrf
                                             <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Setujui</button>
                                         </form>
                                         <form method="POST" action="{{ route('users.reject', $pending) }}" class="d-inline"
-                                              onsubmit="return confirm('Tolak pendaftaran {{ $pending->name }}?')">
+                                              data-confirm="Tolak pendaftaran {{ $pending->name }}?" data-confirm-title="Tolak Pendaftaran?" data-confirm-icon="warning" data-confirm-ok="Ya, tolak">
                                             @csrf
                                             <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i> Tolak</button>
                                         </form>

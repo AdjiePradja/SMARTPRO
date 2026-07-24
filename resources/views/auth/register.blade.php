@@ -2,7 +2,7 @@
 @section('title', 'Daftar')
 
 @section('content')
-    <h1 class="h4 auth-brand mb-1">Pendaftaran Akun Staff</h1>
+    <h1 class="h4 auth-brand mb-1">Pendaftaran Akun Non-Staff</h1>
     <p class="text-muted small mb-4">Akun akan aktif setelah disetujui oleh Group Leader / Pimpinan / Admin IT.</p>
 
     @if ($errors->any())
